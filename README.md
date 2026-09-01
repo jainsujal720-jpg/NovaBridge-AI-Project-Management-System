@@ -72,127 +72,97 @@ Security Testing
 Release Candidate
         ↓
 Production Launch
+```
 A delay in one upstream task may therefore create risk across several downstream activities.
 NovaBridge was designed to detect and explain these relationships automatically.
 
-🧠 System Architecture
-                    NOVABRIDGE AI PM SYSTEM
+## 🧠 System Architecture
 
-                    ┌─────────────────┐
-                    │   Excel Input   │
-                    │ Project / Tasks │
-                    └────────┬────────┘
-                             │
-                             ▼
-                    ┌─────────────────┐
-                    │ Data Validation │
-                    │ & Normalization │
-                    └────────┬────────┘
-                             │
-                             ▼
-              ┌──────────────────────────┐
-              │ Deterministic Python     │
-              │ Risk Analytics Engine    │
-              │                          │
-              │ • Deadlines              │
-              │ • Overdue tasks          │
-              │ • Project health         │
-              │ • Dependencies           │
-              │ • Risk scoring           │
-              └────────────┬─────────────┘
-                           │
-                           ▼
-              ┌──────────────────────────┐
-              │ Structured AI Input      │
-              └────────────┬─────────────┘
-                           │
-                           ▼
-              ┌──────────────────────────┐
-              │ OpenAI Risk Analyst      │
-              │                          │
-              │ • Risk interpretation    │
-              │ • Business impact        │
-              │ • Recommendations        │
-              │ • Executive summary      │
-              └────────────┬─────────────┘
-                           │
-                           ▼
-              ┌──────────────────────────┐
-              │ Validation & Grounding   │
-              │ Evaluation Layer         │
-              └────────────┬─────────────┘
-                           │
-                  ┌────────┴─────────┐
-                  │                  │
-                  ▼                  ▼
-        ┌─────────────────┐  ┌──────────────────┐
-        │ AI PM Copilot   │  │ n8n Automation  │
-        │ + Tool Calling  │  │ Risk Escalation │
-        └─────────────────┘  └──────────────────┘
-⚙️ Core System Components
-1. Excel Data Input & Validation
-The system begins with structured project-management data stored in Excel.
-The input layer validates required fields and transforms spreadsheet rows into structured Python objects used by the analytics engine.
+![NovaBridge AI Project Management System Architecture](assets/novabridge_architecture.png) 
+               
+## ⚙️ Core System Components
+
+### 1. Excel Data Input & Validation
+
+The system begins with structured project-management data stored in Excel. The input layer validates required fields and transforms spreadsheet rows into structured Python objects used by the analytics engine.
 
 Example fields include:
 
-task_id
-project_id
-project_name
-task_name
-owner
-deadline
-status
-priority
-dependency
-latest_update
-2. Deterministic Project Risk Engine
+- `task_id`
+- `project_id`
+- `project_name`
+- `task_name`
+- `owner`
+- `deadline`
+- `status`
+- `priority`
+- `dependency`
+- `latest_update`
+
+### 2. Deterministic Project Risk Engine
+
 Python performs the factual calculations used by the system.
+
 The engine analyzes:
 
-Project completion
-Delayed tasks
-Overdue tasks
-Days overdue
-Direct task dependencies
-Downstream dependency chains
-Blocker severity
-Dependency-chain impact
-Project health
+- Project completion
+- Delayed tasks
+- Overdue tasks
+- Days overdue
+- Direct task dependencies
+- Downstream dependency chains
+- Blocker severity
+- Dependency-chain impact
+- Project health
+
 Example project-health classification:
-GREEN  → On Track
-YELLOW → At Risk
-RED    → Critical
+
+- **GREEN → On Track**
+- **YELLOW → At Risk**
+- **RED → Critical**
+
 This layer deliberately avoids asking the LLM to calculate deterministic project facts.
-3. Dependency Risk Analysis
+
+### 3. Dependency Risk Analysis
+
 NovaBridge builds dependency relationships between tasks and identifies situations where delayed or overdue work can affect downstream activities.
+
 The system can identify:
 
-Root blocker
+```text
+Root Blocker
      ↓
-Directly blocked task
+Directly Blocked Task
      ↓
-Downstream tasks
+Downstream Tasks
      ↓
-Critical downstream work
+Critical Downstream Work
 This helps distinguish an isolated delayed task from a delay capable of affecting an entire delivery chain.
-4. AI Project Risk Analyst
+
+### 4. AI Project Risk Analyst
+
 Structured project analytics are passed to an OpenAI model through the Responses API.
+
 The AI Risk Analyst is instructed to:
 
-Use only supplied project facts
-Avoid inventing deadlines or owners
-Avoid recalculating deterministic metrics
-Identify important project risks
-Explain business impact
-Recommend management actions
-Prioritize management attention
-Explicitly identify information gaps
-The AI therefore acts as an interpretation and reasoning layer above the deterministic analytics engine.
-5. Structured AI Outputs
+- Use only supplied project facts
+- Avoid inventing deadlines or owners
+- Avoid recalculating deterministic metrics
+- Identify important project risks
+- Explain business impact
+- Recommend management actions
+- Prioritize management attention
+- Explicitly identify information gaps
+
+The AI therefore acts as an **interpretation and reasoning layer** above the deterministic analytics engine.
+
+### 5. Structured AI Outputs
+
 The AI analysis uses a defined structured-output schema.
+
 Example structure:
 
+```json
 {
   "portfolio_health": "RED",
   "executive_summary": "...",
@@ -208,7 +178,6 @@ Example structure:
   ],
   "information_gaps": []
 }
-Structured output makes AI results easier to validate and use in downstream automation.
 🛡️ AI Validation & Grounding
 AI output should not automatically be treated as correct.
 NovaBridge therefore includes a validation and grounding layer.
